@@ -9,13 +9,14 @@
  */
 #endregion
 
+using System.Linq;
 using OpenRA.Mods.Common.Effects;
 using OpenRA.Traits;
 
 namespace OpenRA.Mods.Common.Traits
 {
 	[Desc("Can be paradropped by a ParaDrop actor.")]
-	class ParachutableInfo : ITraitInfo
+	class ParachutableInfo : ITraitInfo, Requires<IPositionableInfo>
 	{
 		[Desc("If we land on invalid terrain for my actor type should we be killed?")]
 		public readonly bool KilledOnImpassableTerrain = true;
@@ -50,16 +51,18 @@ namespace OpenRA.Mods.Common.Traits
 		{
 			self = init.Self;
 			this.info = info;
-
-			positionable = self.TraitOrDefault<IPositionable>();
+			positionable = self.Trait<IPositionable>();
 		}
 
-		public void OnLanded()
+		void INotifyParachuteLanded.OnLanded(Actor ignore)
 		{
 			if (!info.KilledOnImpassableTerrain)
 				return;
 
 			if (positionable.CanEnterCell(self.Location, self))
+				return;
+
+			if (ignore != null && self.World.ActorMap.GetActorsAt(self.Location).Any(a => a != ignore))
 				return;
 
 			var terrain = self.World.Map.GetTerrainInfo(self.Location);

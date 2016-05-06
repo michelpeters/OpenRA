@@ -80,8 +80,14 @@ namespace OpenRA.Mods.Common.Traits
 		void INotifyCreated.Created(Actor self)
 		{
 			upgradeManager = self.TraitOrDefault<UpgradeManager>();
+
+			// The upgrade manager exists, but may not have finished being created yet.
+			// We'll defer the upgrades until the end of the tick, at which point it will be ready.
 			if (Cloaked)
-				GrantUpgrades(self);
+			{
+				wasCloaked = true;
+				self.World.AddFrameEndTask(_ => GrantUpgrades(self));
+			}
 		}
 
 		public bool Cloaked { get { return !IsTraitDisabled && remainingTime <= 0; } }

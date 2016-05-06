@@ -59,7 +59,7 @@ namespace OpenRA.Graphics
 			for (var i = 0; i < vertices.Length; i++)
 			{
 				var v = vertices[i];
-				vertices[i] = new Vertex(v.X, v.Y, v.Z, v.U, v.V, palette.TextureIndex, v.C);
+				vertices[i] = new Vertex(v.X, v.Y, v.Z, v.S, v.T, v.U, v.V, palette.TextureIndex, v.C);
 			}
 
 			for (var row = 0; row < map.MapSize.Y; row++)
@@ -68,12 +68,13 @@ namespace OpenRA.Graphics
 
 		public void Update(CPos cell, Sprite sprite)
 		{
-			var pos = sprite == null ? float2.Zero :
-				worldRenderer.ScreenPosition(map.CenterOfCell(cell)) + sprite.Offset - 0.5f * sprite.Size;
-			Update(cell.ToMPos(map.Grid.Type), sprite, pos);
+			var xyz = sprite == null ? float3.Zero :
+				worldRenderer.Screen3DPosition(map.CenterOfCell(cell)) + sprite.Offset - 0.5f * sprite.Size;
+
+			Update(cell.ToMPos(map.Grid.Type), sprite, xyz);
 		}
 
-		public void Update(MPos uv, Sprite sprite, float2 pos)
+		public void Update(MPos uv, Sprite sprite, float3 pos)
 		{
 			if (sprite != null)
 			{

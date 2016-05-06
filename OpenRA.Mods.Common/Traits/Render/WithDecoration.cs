@@ -15,7 +15,7 @@ using System.Linq;
 using OpenRA.Graphics;
 using OpenRA.Traits;
 
-namespace OpenRA.Mods.Common.Traits
+namespace OpenRA.Mods.Common.Traits.Render
 {
 	[Flags]
 	public enum ReferencePoints
@@ -99,7 +99,7 @@ namespace OpenRA.Mods.Common.Traits
 				return Enumerable.Empty<IRenderable>();
 
 			var bounds = self.VisualBounds;
-			var halfSize = (0.5f * Anim.Image.Size).ToInt2();
+			var halfSize = (0.5f * Anim.Image.Size.XY).ToInt2();
 
 			var boundsOffset = new int2(bounds.Left + bounds.Right, bounds.Top + bounds.Bottom) / 2;
 			var sizeOffset = -halfSize;

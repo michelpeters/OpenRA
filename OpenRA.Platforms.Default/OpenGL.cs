@@ -72,6 +72,7 @@ namespace OpenRA.Platforms.Default
 
 		// Depth buffer
 		public const int GL_DEPTH_COMPONENT = 0x1902;
+		public const int GL_LEQUAL = 0x0203;
 
 		// BlendingFactorDest
 		public const int GL_ZERO = 0;
@@ -215,6 +216,9 @@ namespace OpenRA.Platforms.Default
 		public delegate void Uniform2f(int location, float v0, float v1);
 		public static Uniform2f glUniform2f { get; private set; }
 
+		public delegate void Uniform3f(int location, float v0, float v1, float v2);
+		public static Uniform3f glUniform3f { get; private set; }
+
 		public delegate void Uniform1fv(int location, int count, IntPtr value);
 		public static Uniform1fv glUniform1fv { get; private set; }
 
@@ -272,6 +276,9 @@ namespace OpenRA.Platforms.Default
 
 		public delegate void BlendFunc(int sfactor, int dfactor);
 		public static BlendFunc glBlendFunc { get; private set; }
+
+		public delegate void DepthFunc(int func);
+		public static DepthFunc glDepthFunc { get; private set; }
 
 		public delegate void Scissor(int x, int y, int width, int height);
 		public static Scissor glScissor { get; private set; }
@@ -395,6 +402,7 @@ namespace OpenRA.Platforms.Default
 				glUniform1i = Bind<Uniform1i>("glUniform1i");
 				glUniform1f = Bind<Uniform1f>("glUniform1f");
 				glUniform2f = Bind<Uniform2f>("glUniform2f");
+				glUniform3f = Bind<Uniform3f>("glUniform3f");
 				glUniform1fv = Bind<Uniform1fv>("glUniform1fv");
 				glUniform2fv = Bind<Uniform2fv>("glUniform2fv");
 				glUniform3fv = Bind<Uniform3fv>("glUniform3fv");
@@ -414,6 +422,7 @@ namespace OpenRA.Platforms.Default
 				glDisable = Bind<Disable>("glDisable");
 				glBlendEquation = Bind<BlendEquation>("glBlendEquation");
 				glBlendFunc = Bind<BlendFunc>("glBlendFunc");
+				glDepthFunc = Bind<DepthFunc>("glDepthFunc");
 				glScissor = Bind<Scissor>("glScissor");
 				glPushClientAttrib = Bind<PushClientAttrib>("glPushClientAttrib");
 				glPopClientAttrib = Bind<PopClientAttrib>("glPopClientAttrib");

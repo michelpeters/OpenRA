@@ -302,7 +302,7 @@ namespace OpenRA.Mods.Common.Traits
 			{
 				yield return new EnterAlliedActorTargeter<IAcceptResourcesInfo>("Deliver", 5,
 					proc => IsAcceptableProcType(proc),
-					proc => !IsEmpty && proc.Trait<IAcceptResources>().AllowDocking);
+					proc => proc.Trait<IAcceptResources>().AllowDocking);
 				yield return new HarvestOrderTargeter();
 			}
 		}
@@ -386,9 +386,6 @@ namespace OpenRA.Mods.Common.Traits
 				if (order.TargetActor != OwnerLinkedProc)
 					LinkProc(self, OwnerLinkedProc = order.TargetActor);
 
-				if (IsEmpty)
-					return;
-
 				idleSmart = true;
 
 				self.SetTargetLine(Target.FromOrder(self.World, order), Color.Green);
@@ -455,7 +452,7 @@ namespace OpenRA.Mods.Common.Traits
 			public string OrderID { get { return "Harvest"; } }
 			public int OrderPriority { get { return 10; } }
 			public bool IsQueued { get; protected set; }
-			public bool OverrideSelection { get { return true; } }
+			public bool TargetOverridesSelection(TargetModifiers modifiers) { return true; }
 
 			public bool CanTarget(Actor self, Target target, List<Actor> othersAtTarget, ref TargetModifiers modifiers, ref string cursor)
 			{

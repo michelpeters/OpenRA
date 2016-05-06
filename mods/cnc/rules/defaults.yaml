@@ -39,7 +39,7 @@
 	SelfHealing@ELITE:
 		Step: 2
 		Delay: 100
-		HealIfBelow: 1
+		HealIfBelow: 100
 		DamageCooldown: 125
 		UpgradeTypes: selfheal
 		UpgradeMinEnabledLevel: 1
@@ -234,7 +234,7 @@
 	SelfHealing@HOSPITAL:
 		Step: 5
 		Delay: 100
-		HealIfBelow: 1
+		HealIfBelow: 100
 		DamageCooldown: 125
 		UpgradeTypes: hospitalheal
 		UpgradeMinEnabledLevel: 1
@@ -518,7 +518,6 @@
 		GenericStancePrefix: false
 		ShowOwnerRow: false
 	FrozenUnderFog:
-		StartsRevealed: true
 
 ^CivBuildingHusk:
 	Inherits@1: ^SpriteActor
@@ -532,7 +531,6 @@
 		GenericStancePrefix: false
 		ShowOwnerRow: false
 	FrozenUnderFog:
-		StartsRevealed: true
 	ScriptTriggers:
 
 ^TechBuilding:
@@ -567,11 +565,11 @@
 	Tooltip:
 		Name: Field (Destroyed)
 		GenericVisibility: None
+		ShowOwnerRow: false
 	RenderSprites:
 		Palette: terrain
 	WithSpriteBody:
 	FrozenUnderFog:
-		StartsRevealed: true
 	ScriptTriggers:
 
 ^Wall:
@@ -614,6 +612,7 @@
 	Inherits@1: ^SpriteActor
 	Tooltip:
 		Name: Tree
+		ShowOwnerRow: false
 	RenderSprites:
 		Palette: staticterrain
 	WithSpriteBody:
@@ -635,6 +634,7 @@
 	Inherits@1: ^SpriteActor
 	Tooltip:
 		Name: Blossom Tree
+		ShowOwnerRow: false
 	RenderSprites:
 		Palette: staticterrain
 	WithSpriteBody:
@@ -651,6 +651,7 @@
 	Inherits@1: ^SpriteActor
 	Tooltip:
 		Name: Rock
+		ShowOwnerRow: false
 	RenderSprites:
 		Palette: staticterrain
 	WithSpriteBody:
@@ -720,6 +721,7 @@
 	AlwaysVisible:
 	Tooltip:
 		Name: Bridge
+		ShowOwnerRow: false
 	Targetable:
 		RequiresForceFire: yes
 		TargetTypes: Ground, Water
@@ -736,6 +738,7 @@
 	Tooltip:
 		Name: Crate
 		GenericName: Crate
+		ShowOwnerRow: false
 	Crate:
 		TerrainTypes: Clear, Rough, Road, Tiberium, BlueTiberium, Beach
 	RenderSprites:

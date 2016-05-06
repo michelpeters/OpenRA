@@ -9,6 +9,7 @@
  */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -642,7 +643,7 @@ namespace OpenRA.Mods.Common.Effects
 							else
 							{
 								// Aim for the target
-								var vDist = new WVec(-relTarHgt, -relTarHorDist * (targetPassedBy ? -1 : 1), 0);
+								var vDist = new WVec(-relTarHgt, -relTarHorDist, 0);
 								desiredVFacing = (sbyte)vDist.HorizontalLengthSquared != 0 ? vDist.Yaw.Facing : vFacing;
 								if (desiredVFacing < 0 && info.VerticalRateOfTurn < (sbyte)vFacing)
 									desiredVFacing = 0;
@@ -664,6 +665,11 @@ namespace OpenRA.Mods.Common.Effects
 					// of vertical facing bound by the maximum vertical rate of turn
 					var vDist = new WVec(-diffClfMslHgt - info.CruiseAltitude.Length, -speed, 0);
 					desiredVFacing = (sbyte)vDist.HorizontalLengthSquared != 0 ? vDist.Yaw.Facing : vFacing;
+
+					// If the missile is launched above CruiseAltitude, it has to descend instead of climbing
+					if (-diffClfMslHgt > info.CruiseAltitude.Length)
+						desiredVFacing = -desiredVFacing;
+
 					desiredVFacing = desiredVFacing.Clamp(-info.VerticalRateOfTurn, info.VerticalRateOfTurn);
 
 					ChangeSpeed();
@@ -675,6 +681,11 @@ namespace OpenRA.Mods.Common.Effects
 				// of vertical facing bound by the maximum vertical rate of turn
 				var vDist = new WVec(-diffClfMslHgt - info.CruiseAltitude.Length, -speed, 0);
 				desiredVFacing = (sbyte)vDist.HorizontalLengthSquared != 0 ? vDist.Yaw.Facing : vFacing;
+
+				// If the missile is launched above CruiseAltitude, it has to descend instead of climbing
+				if (-diffClfMslHgt > info.CruiseAltitude.Length)
+					desiredVFacing = -desiredVFacing;
+
 				desiredVFacing = desiredVFacing.Clamp(-info.VerticalRateOfTurn, info.VerticalRateOfTurn);
 
 				ChangeSpeed();
@@ -701,9 +712,10 @@ namespace OpenRA.Mods.Common.Effects
 			var velVec = tarDistVec + predVel;
 			var desiredHFacing = velVec.HorizontalLengthSquared != 0 ? velVec.Yaw.Facing : hFacing;
 
-			if (allowPassBy && System.Math.Abs(desiredHFacing - hFacing) >= System.Math.Abs(desiredHFacing + 128 - hFacing))
+			var delta = Util.NormalizeFacing(hFacing - desiredHFacing);
+			if (allowPassBy && delta > 64 && delta < 192)
 			{
-				desiredHFacing += 128;
+				desiredHFacing = (desiredHFacing + 128) & 0xFF;
 				targetPassedBy = true;
 			}
 			else

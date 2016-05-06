@@ -54,10 +54,10 @@ namespace OpenRA.Graphics
 				if (allocated)
 					throw new SheetOverflowException("");
 				allocated = true;
-				return SheetBuilder.AllocateSheet(SheetType.DualIndexed, Game.Settings.Graphics.SheetSize);
+				return SheetBuilder.AllocateSheet(SheetType.Indexed, Game.Settings.Graphics.SheetSize);
 			};
 
-			return new SheetBuilder(SheetType.DualIndexed, allocate);
+			return new SheetBuilder(SheetType.Indexed, allocate);
 		}
 
 		public VoxelLoader(IReadOnlyFileSystem fileSystem)
@@ -71,13 +71,14 @@ namespace OpenRA.Graphics
 			sheetBuilder = CreateSheetBuilder();
 		}
 
-		Vertex[] GenerateSlicePlane(int su, int sv, Func<int, int, VxlElement> first, Func<int, int, VxlElement> second, Func<int, int, float[]> coord)
+		Vertex[] GenerateSlicePlane(int su, int sv, Func<int, int, VxlElement> first, Func<int, int, VxlElement> second, Func<int, int, float3> coord)
 		{
 			var colors = new byte[su * sv];
 			var normals = new byte[su * sv];
 
 			var c = 0;
 			for (var v = 0; v < sv; v++)
+			{
 				for (var u = 0; u < su; u++)
 				{
 					var voxel = first(u, v) ?? second(u, v);
@@ -85,22 +86,28 @@ namespace OpenRA.Graphics
 					normals[c] = voxel == null ? (byte)0 : voxel.Normal;
 					c++;
 				}
+			}
 
-			var s = sheetBuilder.Allocate(new Size(su, sv));
-			Util.FastCopyIntoChannel(s, 0, colors);
-			Util.FastCopyIntoChannel(s, 1, normals);
+			var size = new Size(su, sv);
+			var s = sheetBuilder.Allocate(size);
+			var t = sheetBuilder.Allocate(size);
+			Util.FastCopyIntoChannel(s, colors);
+			Util.FastCopyIntoChannel(t, normals);
+
+			// s and t are guaranteed to use the same sheet because
+			// of the custom voxel sheet allocation implementation
 			s.Sheet.CommitBufferedData();
 
 			var channelP = ChannelSelect[(int)s.Channel];
-			var channelC = ChannelSelect[(int)s.Channel + 1];
+			var channelC = ChannelSelect[(int)t.Channel];
 			return new Vertex[6]
 			{
-				new Vertex(coord(0, 0), s.Left, s.Top, channelP, channelC),
-				new Vertex(coord(su, 0), s.Right, s.Top, channelP, channelC),
-				new Vertex(coord(su, sv), s.Right, s.Bottom, channelP, channelC),
-				new Vertex(coord(su, sv), s.Right, s.Bottom, channelP, channelC),
-				new Vertex(coord(0, sv), s.Left, s.Bottom, channelP, channelC),
-				new Vertex(coord(0, 0), s.Left, s.Top, channelP, channelC)
+				new Vertex(coord(0, 0), s.Left, s.Top, t.Left, t.Top, channelP, channelC),
+				new Vertex(coord(su, 0), s.Right, s.Top, t.Right, t.Top, channelP, channelC),
+				new Vertex(coord(su, sv), s.Right, s.Bottom, t.Right, t.Bottom, channelP, channelC),
+				new Vertex(coord(su, sv), s.Right, s.Bottom, t.Right, t.Bottom, channelP, channelC),
+				new Vertex(coord(0, sv), s.Left, s.Bottom, t.Left, t.Bottom, channelP, channelC),
+				new Vertex(coord(0, 0), s.Left, s.Top, t.Left, t.Top, channelP, channelC)
 			};
 		}
 
@@ -158,21 +165,21 @@ namespace OpenRA.Graphics
 					yield return GenerateSlicePlane(l.Size[1], l.Size[2],
 						(u, v) => get(x, u, v),
 						(u, v) => get(x - 1, u, v),
-						(u, v) => new float[] { x, u, v });
+						(u, v) => new float3(x, u, v));
 
 			for (var y = 0; y <= l.Size[1]; y++)
 				if (yPlanes[y])
 					yield return GenerateSlicePlane(l.Size[0], l.Size[2],
 						(u, v) => get(u, y, v),
 						(u, v) => get(u, y - 1, v),
-						(u, v) => new float[] { u, y, v });
+						(u, v) => new float3(u, y, v));
 
 			for (var z = 0; z <= l.Size[2]; z++)
 				if (zPlanes[z])
 					yield return GenerateSlicePlane(l.Size[0], l.Size[1],
 						(u, v) => get(u, v, z),
 						(u, v) => get(u, v, z - 1),
-						(u, v) => new float[] { u, v, z });
+						(u, v) => new float3(u, v, z));
 		}
 
 		public VoxelRenderData GenerateRenderData(VxlLimb l)

@@ -100,9 +100,11 @@ namespace OpenRA.Widgets
 					{
 						if (!IsValidDragbox && World.Selection.Actors.Any() && !multiClick)
 						{
-							if (!(World.ScreenMap.ActorsAt(mousePos).Any(x => x.Info.HasTraitInfo<SelectableInfo>() &&
-								(x.Owner.IsAlliedWith(World.RenderPlayer) || !World.FogObscures(x))) && !mi.Modifiers.HasModifier(Modifiers.Ctrl) &&
-								!mi.Modifiers.HasModifier(Modifiers.Alt) && UnitOrderGenerator.InputOverridesSelection(World, mousePos, mi)))
+							var selectableActor = World.ScreenMap.ActorsAt(mousePos).Any(x =>
+								x.Info.HasTraitInfo<SelectableInfo>() && (x.Owner.IsAlliedWith(World.RenderPlayer) || !World.FogObscures(x)));
+
+							var uog = (UnitOrderGenerator)World.OrderGenerator;
+							if (!selectableActor || uog.InputOverridesSelection(World, mousePos, mi))
 							{
 								// Order units instead of selecting
 								ApplyOrders(World, mi);
@@ -343,8 +345,16 @@ namespace OpenRA.Widgets
 
 		bool TogglePixelDouble()
 		{
-			Game.Settings.Graphics.PixelDouble ^= true;
-			worldRenderer.Viewport.Zoom = Game.Settings.Graphics.PixelDouble ? 2 : 1;
+			if (worldRenderer.Viewport.Zoom == 1f)
+				worldRenderer.Viewport.Zoom = 2f;
+			else
+			{
+				// Reset zoom to regular view if it was anything else before
+				// (like a zoom level only reachable by using the scroll wheel).
+				worldRenderer.Viewport.Zoom = 1f;
+			}
+
+			Game.Settings.Graphics.PixelDouble = worldRenderer.Viewport.Zoom == 2f;
 
 			return true;
 		}

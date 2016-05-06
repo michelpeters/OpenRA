@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using OpenRA.Activities;
 using OpenRA.Mods.Common.Activities;
 using OpenRA.Mods.Common.Orders;
+using OpenRA.Mods.Common.Traits.Render;
 using OpenRA.Traits;
 
 namespace OpenRA.Mods.Common.Traits
@@ -52,6 +53,9 @@ namespace OpenRA.Mods.Common.Traits
 
 		[Desc("Sound to play when undeploying.")]
 		public readonly string UndeploySound = null;
+
+		[Desc("Can this actor undeploy?")]
+		public readonly bool CanUndeploy = true;
 
 		public object Create(ActorInitializer init) { return new DeployToUpgrade(init, this); }
 	}
@@ -112,7 +116,7 @@ namespace OpenRA.Mods.Common.Traits
 		public IEnumerable<IOrderTargeter> Orders
 		{
 			get { yield return new DeployOrderTargeter("DeployToUpgrade", 5,
-				() => IsOnValidTerrain() ? info.DeployCursor : info.DeployBlockedCursor); }
+				() => IsCursorBlocked() ? info.DeployBlockedCursor : info.DeployCursor); }
 		}
 
 		public Order IssueOrder(Actor self, IOrderTargeter order, Target target, bool queued)
@@ -131,7 +135,7 @@ namespace OpenRA.Mods.Common.Traits
 			if (!order.Queued)
 				self.CancelActivity();
 
-			if (deployState == DeployState.Deployed)
+			if (deployState == DeployState.Deployed && info.CanUndeploy)
 			{
 				self.QueueActivity(new CallFunc(Undeploy));
 			}
@@ -143,6 +147,11 @@ namespace OpenRA.Mods.Common.Traits
 
 				self.QueueActivity(new CallFunc(Deploy));
 			}
+		}
+
+		bool IsCursorBlocked()
+		{
+			return ((deployState == DeployState.Deployed) && !info.CanUndeploy) || (!IsOnValidTerrain() && (deployState != DeployState.Deployed));
 		}
 
 		bool IsOnValidTerrain()

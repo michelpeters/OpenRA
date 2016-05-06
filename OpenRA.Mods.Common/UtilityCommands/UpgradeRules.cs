@@ -100,7 +100,7 @@ namespace OpenRA.Mods.Common.UtilityCommands
 				{
 					if (node.Key == "Color")
 					{
-						if (parent.Key.StartsWith("FixedColorPalette"))
+						if (parent != null && parent.Key.StartsWith("FixedColorPalette"))
 							TryUpdateHSLColor(ref node.Value.Value);
 						else
 							TryUpdateColor(ref node.Value.Value);
@@ -748,6 +748,33 @@ namespace OpenRA.Mods.Common.UtilityCommands
 							captThreshNode.Value.Value = newValue.ToString();
 						}
 					}
+				}
+
+				if (engineVersion < 20160402)
+				{
+					// Fix misleading property naming.
+					if (node.Key == "EffectSequence" && parent != null && parent.Key == "SpawnActorPower")
+						node.Key = "EffectImage";
+				}
+
+				if (engineVersion < 20160408)
+				{
+					var traitNode = node.Value.Nodes.FirstOrDefault(n => n.Key == "InsufficientFundsWarning");
+					if (traitNode != null)
+					{
+						var prNode = node.Value.Nodes.FirstOrDefault(n => n.Key == "PlayerResources");
+						if (prNode != null)
+							prNode.Value.Nodes.Add(new MiniYamlNode("InsufficientFundsNotification", new MiniYaml("InsufficientFunds")));
+
+						node.Value.Nodes.Remove(traitNode);
+					}
+				}
+
+				if (engineVersion < 20160418)
+				{
+					// Removed FrozenUnderFog.StartsRevealed
+					if (node.Key == "FrozenUnderFog")
+						node.Value.Nodes.RemoveAll(x => x.Key == "StartsRevealed");
 				}
 
 				UpgradeActorRules(engineVersion, ref node.Value.Nodes, node, depth + 1);

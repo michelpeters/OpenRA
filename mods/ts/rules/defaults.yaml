@@ -35,7 +35,7 @@
 	SelfHealing@ELITE:
 		Step: 2
 		Delay: 100
-		HealIfBelow: 1
+		HealIfBelow: 100
 		DamageCooldown: 125
 		UpgradeTypes: selfheal
 		UpgradeMinEnabledLevel: 1
@@ -220,6 +220,7 @@
 	Health:
 		Shape: Circle
 			Radius: 363
+			VerticalTopOffset: 512
 
 ^BuildingPlug:
 	AlwaysVisible:
@@ -239,6 +240,7 @@
 		HP: 50
 		Shape: Circle
 			Radius: 128
+			VerticalTopOffset: 512
 	Armor:
 		Type: None
 	Valued:
@@ -257,7 +259,9 @@
 			DirtRoad: 100
 			Rough: 80
 			Tiberium: 90
+				PathingCost: 90
 			BlueTiberium: 90
+				PathingCost: 90
 			Veins: 50
 	SelectionDecorations:
 		Palette: pips
@@ -318,7 +322,7 @@
 	SelfHealing@HOSPITAL:
 		Step: 5
 		Delay: 100
-		HealIfBelow: 1
+		HealIfBelow: 100
 		DamageCooldown: 125
 		UpgradeTypes: hospitalheal
 		UpgradeMinEnabledLevel: 1
@@ -396,6 +400,7 @@
 			Tiberium: 50
 			BlueTiberium: 50
 			Veins: 50
+				PathingCost: 90
 		TurnSpeed: 5
 		Voice: Move
 	Selectable:
@@ -434,6 +439,9 @@
 		Weapons: SmallDebris
 		Pieces: 3, 7
 		Range: 2c0, 5c0
+	PoisonedByTiberium:
+		Weapon: Veins
+		Resources: Veins
 
 ^Tank:
 	Inherits: ^Vehicle
@@ -564,6 +572,7 @@
 	Health:
 		Shape: Circle
 			Radius: 256
+			VerticalTopOffset: 512
 	Armor:
 		Type: Light
 	Mobile:
@@ -607,7 +616,6 @@
 	RadarColorFromTerrain:
 		Terrain: Tiberium
 	FrozenUnderFog:
-		StartsRevealed: true
 	SeedsResource:
 		ResourceType: Tiberium
 		Interval: 55

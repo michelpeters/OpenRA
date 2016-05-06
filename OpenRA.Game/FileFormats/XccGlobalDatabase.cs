@@ -9,37 +9,46 @@
  */
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace OpenRA.FileFormats
 {
-	public class XccGlobalDatabase
+	public class XccGlobalDatabase : IDisposable
 	{
 		public readonly string[] Entries;
-		public XccGlobalDatabase(Stream s)
+		readonly Stream s;
+
+		public XccGlobalDatabase(Stream stream)
 		{
+			s = stream;
+
 			var entries = new List<string>();
-			var reader = new BinaryReader(s);
-			while (reader.PeekChar() > -1)
+			while (s.Peek() > -1)
 			{
-				var count = reader.ReadInt32();
+				var count = s.ReadInt32();
 				for (var i = 0; i < count; i++)
 				{
 					var chars = new List<char>();
-					char c;
+					byte c;
 
 					// Read filename
-					while ((c = reader.ReadChar()) != 0)
-						chars.Add(c);
+					while ((c = s.ReadUInt8()) != 0)
+						chars.Add((char)c);
 					entries.Add(new string(chars.ToArray()));
 
 					// Skip comment
-					while ((c = reader.ReadChar()) != 0) { }
+					while ((c = s.ReadUInt8()) != 0) { }
 				}
 			}
 
 			Entries = entries.ToArray();
+		}
+
+		public void Dispose()
+		{
+			s.Dispose();
 		}
 	}
 }

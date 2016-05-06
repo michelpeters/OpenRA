@@ -24,10 +24,6 @@ Players:
 		OwnsWorld: True
 		NonCombatant: True
 		Faction: england
-	PlayerReference@Creeps:
-		Name: Creeps
-		NonCombatant: True
-		Faction: england
 	PlayerReference@Greece:
 		Name: Greece
 		Faction: allies
@@ -581,9 +577,6 @@ Actors:
 	ReinfRoadPoint: waypoint
 		Location: 52,42
 		Owner: Neutral
-	NWIdlePoint: waypoint
-		Location: 38,42
-		Owner: Neutral
 	EIslandPoint: waypoint
 		Location: 51,58
 		Owner: Neutral
@@ -603,4 +596,4 @@ Actors:
 		Location: 21,80
 		Owner: Neutral
 
-Rules: rules.yaml
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, rules.yaml

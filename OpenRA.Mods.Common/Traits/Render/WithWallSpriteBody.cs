@@ -16,7 +16,7 @@ using OpenRA.Graphics;
 using OpenRA.Mods.Common.Graphics;
 using OpenRA.Traits;
 
-namespace OpenRA.Mods.Common.Traits
+namespace OpenRA.Mods.Common.Traits.Render
 {
 	[RequireExplicitImplementation]
 	interface IWallConnectorInfo : ITraitInfoInterface
@@ -140,6 +140,9 @@ namespace OpenRA.Mods.Common.Traits
 		{
 			DefaultAnimation.PlayFetchIndex(NormalizeSequence(self, Info.Sequence), () => adjacent);
 			UpdateNeighbours(self);
+
+			// Set the initial animation frame before the render tick (for frozen actor previews)
+			self.World.AddFrameEndTask(_ => DefaultAnimation.Tick());
 		}
 
 		static void UpdateNeighbours(Actor self)

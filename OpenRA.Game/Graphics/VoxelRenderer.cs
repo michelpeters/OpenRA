@@ -161,8 +161,8 @@ namespace OpenRA.Graphics
 			CalculateSpriteGeometry(tl, br, 1, out spriteSize, out spriteOffset);
 			CalculateSpriteGeometry(stl, sbr, 2, out shadowSpriteSize, out shadowSpriteOffset);
 
-			var sprite = sheetBuilder.Allocate(spriteSize, spriteOffset);
-			var shadowSprite = sheetBuilder.Allocate(shadowSpriteSize, shadowSpriteOffset);
+			var sprite = sheetBuilder.Allocate(spriteSize, 0, spriteOffset);
+			var shadowSprite = sheetBuilder.Allocate(shadowSpriteSize, 0, shadowSpriteOffset);
 			var sb = sprite.Bounds;
 			var ssb = shadowSprite.Bounds;
 			var spriteCenter = new float2(sb.Left + sb.Width / 2, sb.Top + sb.Height / 2);
@@ -332,7 +332,7 @@ namespace OpenRA.Graphics
 
 			var size = new Size(renderer.SheetSize, renderer.SheetSize);
 			var framebuffer = renderer.Device.CreateFrameBuffer(size);
-			var sheet = new Sheet(SheetType.DualIndexed, framebuffer.Texture);
+			var sheet = new Sheet(SheetType.BGRA, framebuffer.Texture);
 			mappedBuffers.Add(sheet, framebuffer);
 
 			return sheet;
